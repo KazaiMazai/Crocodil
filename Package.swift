@@ -2,23 +2,51 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import CompilerPluginSupport
 
 let package = Package(
     name: "Crocodil",
+    platforms: [
+       .iOS(.v13),
+       .macOS(.v10_15),
+       .tvOS(.v12),
+       .watchOS(.v7)
+
+    ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "Crocodil",
             targets: ["Crocodil"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"601.0.0"),
+    ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
+        .macro(
+            name: "CrocodilMacros",
+            dependencies: [
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
+            ]
+        ),
         .target(
-            name: "Crocodil"),
+            name: "Crocodil",
+            dependencies: [
+                "CrocodilMacros"
+            ]
+        ),
         .testTarget(
             name: "CrocodilTests",
             dependencies: ["Crocodil"]
         ),
+        .testTarget(
+            name: "CrocodilMacrosTests",
+            dependencies: [
+                "CrocodilMacros",
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax")
+            ]
+        )
     ]
 )
+ 
