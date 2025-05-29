@@ -22,10 +22,10 @@ Scenarios where initializer-based DI doesn't work:
 DI enables easy mocking and stubbing. Crocodil makes swapping dependencies effortless for testing purposes.
 
 
-## Why Crocodil
+## Why Crocodil Injection
 
 - **Inject Anything**
-Supports injection of enums, structs, classes, closures, and even unprotocolized types.
+Supports injection of enums, structs, classes, closures, and protocol conforming instances
 
 - **Compile-time Safety**
 Ensures key-path validity and detects missing dependencies during compilation.
@@ -40,7 +40,7 @@ Uses @Dependency for clean and read-only property injection.
 Built-in concurrency support with safe, synchronized access to dependencies.
 
 - **Macro-powered Simplicity**
-With @DependencyEntry, Crocodil uses Swift macros to register and declare dependencies in one place.
+With @DependencyEntry`, Crocodil uses Swift macros to register and declare dependencies in one place.
 
 
 ## Usage
@@ -59,7 +59,6 @@ extension Dependencies {
     @DependencyEntry var now = { Date() }
 }
 ```
-
 
 ### Accessing Dependencies
 
@@ -106,4 +105,4 @@ Crocodil’s DI container uses a dedicated concurrent queue with synchronization
 
 ## ⚠️ Limitations
 - **Circular Dependencies**: Crocodil cannot detect circular references during compile-time yet. 
-- **Dependency Safety**: While read/write access is synchronized, the injected instances are not automatically thread-safe.
+- **Dependency Safety**: While read/write access to the injected instances is synchronized, the injected instances are not automatically thread-safe.
