@@ -97,7 +97,7 @@ Dependencies.inject(\.networkClient, NetworkClientMock())
 
 
 ## Thread Safety
-Crocodil’s DI container uses a dedicated concurrent queue with synchronization:
+Crocodil’s DI container uses a dedicated concurrent queue with synchronization.
 
 > [!WARNING]
 > The DI container is thread-safe. However, the dependencies themselves must be made thread-safe by the developer.
@@ -105,4 +105,4 @@ Crocodil’s DI container uses a dedicated concurrent queue with synchronization
 
 ## ⚠️ Limitations
 - **Circular Dependencies**: Crocodil cannot detect circular references during compile-time yet. 
-- **Dependency Safety**: While read/write access to the injected instances is synchronized, the injected instances are not automatically thread-safe.
+- **Thread Safety**: While read/write access to the injected instances is synchronized, the injected instances are not automatically thread-safe.
