@@ -21,7 +21,7 @@ final class CrocodilTests: XCTestCase {
         XCTAssertEqual(Dependency[\.intValue], 2)
     }
     
-    func test_whenSettingDepenency_DepencencyUpdated() {
+    func test_whenSettingDepenency_DependencyUpdated() {
         Dependencies.set(\.intValue, 2)
         XCTAssertEqual(Dependency[\.intValue], 2)
     }

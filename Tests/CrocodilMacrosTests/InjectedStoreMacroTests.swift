@@ -35,7 +35,7 @@ final class InjectedStoreMacroTests: XCTestCase {
                     }
 
                     private enum _ValueKey: DependencyKey {
-                        nonisolated(unsafe) static var currentValue = 10
+                        nonisolated(unsafe) static var instance = 10
                     }
                 }
                 """,

@@ -9,8 +9,6 @@ import Foundation
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-
-
 public struct DependencyInjectionMacro: AccessorMacro, PeerMacro {
     public static func expansion(
         of node: AttributeSyntax,
@@ -47,7 +45,7 @@ public struct DependencyInjectionMacro: AccessorMacro, PeerMacro {
         return [
         """
         private enum _\(raw: propertiesAttributes.keyName): DependencyKey {
-            nonisolated(unsafe) static var currentValue \(propertiesAttributes.initializerClauseSyntax)
+            nonisolated(unsafe) static var instance \(propertiesAttributes.initializerClauseSyntax)
         }
         """
         ]
