@@ -1,127 +1,109 @@
-Crocodil is a dependency injection library for Swift that provides a clean way to inject dependencies in your applications.
+
+# 🐊 Crocodil — Lightweight Dependency Injection for Swift
+
+Crocodil is a dependency injection (DI) library for Swift that provides a straightforward, boilerplate-free way to manage dependencies in your applications.
+
 
 ## Overview
+Dependency Injection is a design pattern that implements Inversion of Control (IoC) to decouple component dependencies. Crocodil offers a lightweight and macro-powered approach to DI in Swift, supporting everything from property wrappers to compile-time safety.
 
-Dependency Injection (DI) is a design pattern that implements Inversion of Control (IoC) for managing dependencies between components. Crocodil provides a boilerplate-free way to handle dependency injection in Swift applications.
+### Problems Solved by Dependency Injection
 
-## Problems Solved by Dependency Injection
+1. **Tight Coupling**
+Without DI, components often create dependencies directly, leading to tight coupling. Crocodil promotes loose coupling, making components easier to test, reuse, and maintain.
 
-1. **Tight Coupling**: Without DI, components often create their dependencies directly, leading to tight coupling. Crocodil helps create loosely coupled components that are easier to maintain and test.
+2. **Initializer Injection Not Always Possible**
+Scenarios where initializer-based DI doesn't work:
+- Interfacing with system or third-party frameworks where initializers can't be modified
+- Singleton objects that manage their own instantiation
+- Legacy codebases with rigid construction patterns
 
-2. **Cases when injection via initializer is impossible**: Sometimes initializer injection is not possible, such as:
-   - When working with system frameworks or third-party code where you can't modify the initializer
-   - For singleton objects that control their own instantiation
-   - When dealing with legacy code that requires specific initialization patterns
-   Crocodil provides property wrapper-based injection as an elegant solution for these scenarios.
-
-3. **Testing Complexity**: DI makes it easier to substitute real implementations with mocks during testing. Crocodil's design makes this process straightforward.
+3. **Testing Complexity**
+DI enables easy mocking and stubbing. Crocodil makes swapping dependencies effortless for testing purposes.
 
 
-## Why Crocodil Injection
+## Why Crocodil
 
-1. **Inject Anything**: Crocodil allows injection of any Swift type: covered with protocols or not or even closures.
+- **Inject Anything**
+Supports injection of enums, structs, classes, closures, and even unprotocolized types.
 
-2. **Thread Safety**: Built-in thread-safe implementation ensuring safe concurrent access to dependencies.
+- **Compile-time Safety**
+Ensures key-path validity and detects missing dependencies during compilation.
 
-3. **Inject safely. No Rot**: Leverages Swift's type system to provide compile-time check for dependency registration and keys correctness
+- **Swift Concurrency Compliant**
+Drop-in replacement for singletons, without triggering strict concurrency mode violations.
 
-4. **Property Wrapper Support**: Uses `@Dependency` property wrapper for clean dependency resolution and read-only access.
+- **Clean Property Injection**
+Uses @Dependency for clean and read-only property injection.
 
-5. **Macro-powered**: Utilizes Swift macros (`@DependencyEntry`) to reduce boilerplate code,  explicitly register entry points and keyPath-based keys.
+- **Thread Safety**
+Built-in concurrency support with safe, synchronized access to dependencies.
+
+- **Macro-powered Simplicity**
+With @DependencyEntry, Crocodil uses Swift macros to register and declare dependencies in one place.
 
 
 ## Usage
-
-### Dependencies Registration
-
-Both declaration and registration is done in single shot ensuring that nothing is missed at compile time:
+### Registering Dependencies
+Declaration and registration happen in one shot, ensuring compile-time completeness:
 
 ```swift
 extension Dependencies {
+    // Register protocol implementation
     @DependencyEntry var networkClient: ClientProtocol = NetworkClient()
-    @DependencyEntry var userDefaults = UserDefaults.standard
-    @DependencyEntry var now = { Date() }  
+
+    // Register shared instance
+    @DependencyEntry var userDefaultsStorage = UserDefaults.standard
+
+    // Register closure
+    @DependencyEntry var now = { Date() }
 }
 ```
+
+
 ### Accessing Dependencies
 
-DependencyEntry's property serves as keyPath-based key:
+Use `@Dependency` to inject dependencies via key paths:
 
 ```swift
-struct AppState {
+struct ViewModel {
     @Dependency(\.networkClient) var client
-    @Dependency(\.userDefaults) var userDefaultsStorage
-    @Dependency(\.now) var currentTime
-    
-    // access via property wrapper
-    func accessViaPropertyWrapper() {
-        let time = currentTime()
-        client.doSomething()
-    }
-
-    // or use static keyPath accessor:
-    func accessViaKeyPath() {
-        let getCurrentTime = Dependency[\.now]
-        let time = getCurrentTime()
-    }
+    @Dependency(\.userDefaultsStorage) var storage
 }
+```
+Or access dependencies directly:
+
+```swift
+let currentTime = Dependency[\.now]
+let time = currentTime()
 ```
 
 ### Mocking Dependencies
+Swap out dependencies at runtime, perfect for unit tests:
 
 ```swift
-Dependencies[\.networkClient] = NetworkClientMock()
+Dependencies.set(\.networkClient, NetworkClientMock())
 ```
 
-## Crocodil vs SwiftUI's EnvironmentValues
+## Crocodil vs. SwiftUI's EnvironmentValues
 
-Crocodil API is very similar to SwiftUI's EnvironmentValues. While both Crocodil and SwiftUI's EnvironmentValues system solve dependency injection, they have different approaches and use cases:
+| Feature           | SwiftUI EnvironmentValues   | Crocodil Dependencies           |
+|------------------|-----------------------------|---------------------------------|
+| Context           | SwiftUI-only                | Framework-agnostic              |
+| Propagation       | Passed down view hierarchy  | Globally accessible             |
+| View Re-rendering | Triggers updates            | Does **not** trigger updates    |
+| Keys Mechanism    | Uses `EnvironmentKey`       | Uses `DependencyKey`            |
+| Macro             | `@Entry`                    | `@DependencyEntry`              |
+| Thread Safety     | Limited                     | **Built-in concurrent safety**  |
 
-### SwiftUI EnvironmentValues
-- Specifically designed for SwiftUI view hierarchy
-- Values are passed down through the view tree
-- Triggers SwiftUI views udpates
-- Limited to SwiftUI context
-- Uses `EnvironmentKey` protocol for keys
-- Uses `@Entry` macro for entry point
-
-
-### Crocodil Dependencies
-- Framework-agnostic solution
-- Globally accessible
-- Thread-safe read/write acess
-- Doesn't trigger SwiftUI views udpates
-- Uses `DependencyKey` protocol for keys
-- Uses `@DependencyEntry` macro for entry point
 
 ## Thread Safety
+Crocodil’s DI container uses a dedicated concurrent queue with synchronization:
 
-Crocodil ensures thread-safe access to dependencies using a dedicated concurrent dispatch queue with appropriate synchronization. This means:
+> [!WARNING]
+> The DI container is thread-safe. However, the dependencies themselves must be made thread-safe by the developer.
 
-- Multiple reads can occur simultaneously
-- Writes are synchronized to prevent race conditions
-- Dependencies can be safely accessed from different threads
 
-Important to note: threadsafety is only provided for DI container. Threadsafety of the dependency itself is still on developer's responsibility.
-
-## Limitations
-
-- Crocodil does it best to be as harmless as possible but stull cannot spot circular dependencies declarations.
-
-- Threadsafety is only provided for DI container. Reading dependency from different threads is fine, writing won't create data races and crash the app, but threadsafety of the dependency itself is still on developer's responsibility.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. Make sure to read the contribution guidelines first.
-
-### Development Process
-1. Fork the repo
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-Crocodil is available under the MIT license. See the LICENSE file for more info.
-
+## ⚠️ Limitations
+- **Circular Dependencies**: Crocodil cannot detect circular references yet.
+- **Dependency Safety**: While read/write access is synchronized, the injected instances are not automatically thread-safe.

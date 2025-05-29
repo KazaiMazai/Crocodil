@@ -26,7 +26,7 @@ extension DependencyContainer {
     }
 
     /** A static subscript accessor for updating and references dependencies directly. */
-    public static subscript<T>(_ keyPath: WritableKeyPath<Self, T>) -> T {
+    static subscript<T>(_ keyPath: WritableKeyPath<Self, T>) -> T {
         get {
             Self()[keyPath: keyPath]
         }
@@ -34,6 +34,11 @@ extension DependencyContainer {
             var instance = Self()
             instance[keyPath: keyPath] = newValue
         }
+    }
+    
+    public static func set<T>(_ keyPath: WritableKeyPath<Self, T>, _ value: T) {
+        var instance = Self()
+        instance[keyPath: keyPath] = value
     }
 }
 

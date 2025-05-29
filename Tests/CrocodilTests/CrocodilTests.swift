@@ -4,7 +4,7 @@ import Crocodil
 extension Dependencies {
     @DependencyEntry var intValue: Int = 1
     @DependencyEntry var anotherIntValue: Int = Dependency[\.intValue] + 1
-    @DependencyEntry var oneMoreIntValue: Int = Dependencies[\.anotherIntValue] + 1
+    @DependencyEntry var oneMoreIntValue: Int = Dependency[\.anotherIntValue] + 1
 }
  
 final class CrocodilTests: XCTestCase {
@@ -17,12 +17,12 @@ final class CrocodilTests: XCTestCase {
     func test_whenReadAndWriteToSharedStoresValue_NoDeadlockOccurs() {
         XCTAssertEqual(Dependency[\.intValue], 1)
         
-        Dependencies[\.intValue] = Dependencies[\.intValue] + 1
-        XCTAssertEqual(Dependencies[\.intValue], 2)
+        Dependencies.set(\.intValue, Dependency[\.intValue] + 1)
+        XCTAssertEqual(Dependency[\.intValue], 2)
     }
     
     func test_whenSettingDepenency_DepencencyUpdated() {
-        Dependencies[\.intValue] = 2
-        XCTAssertEqual(Dependencies[\.intValue], 2)
+        Dependencies.set(\.intValue, 2)
+        XCTAssertEqual(Dependency[\.intValue], 2)
     }
 }
