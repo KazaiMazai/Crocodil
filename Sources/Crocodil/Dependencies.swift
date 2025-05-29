@@ -8,17 +8,15 @@
 import Foundation
 
 public struct Dependencies: Sendable {
-    private init() {
-        
-    }
+    private init() { }
     
     /** A static subscript for updating the `currentValue` of `DependencyKey` instances. */
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey, Key.Value: Sendable {
         get {
-            DispatchQueue.di.sync { key.currentValue }
+            DispatchQueue.di.sync { key.instance }
         }
         set {
-            DispatchQueue.di.async(flags: .barrier) { key.currentValue = newValue }
+            DispatchQueue.di.async(flags: .barrier) { key.instance = newValue }
         }
     }
 
@@ -33,7 +31,7 @@ public struct Dependencies: Sendable {
         }
     }
     
-    public static func set<T>(_ keyPath: WritableKeyPath<Self, T>, _ value: T) {
+    public static func inject<T>(_ keyPath: WritableKeyPath<Self, T>, _ value: T) {
         var instance = Self()
         instance[keyPath: keyPath] = value
     }
@@ -41,5 +39,5 @@ public struct Dependencies: Sendable {
 
 
 fileprivate extension DispatchQueue {
-    static let di = DispatchQueue(label: "com.crocodil.dependencies", attributes: .concurrent)
+    static let di = DispatchQueue(label: "com.crocodil.queue", attributes: .concurrent)
 }

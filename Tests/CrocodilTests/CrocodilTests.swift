@@ -14,15 +14,15 @@ final class CrocodilTests: XCTestCase {
         XCTAssertEqual(value, 1)
     }
     
-    func test_whenReadAndWriteToSharedStoresValue_NoDeadlockOccurs() {
+    func test_whenReadAndWriteValue_NoDeadlockOccurs() {
         XCTAssertEqual(Dependency[\.intValue], 1)
         
-        Dependencies.set(\.intValue, Dependency[\.intValue] + 1)
+        Dependencies.inject(\.intValue, Dependency[\.intValue] + 1)
         XCTAssertEqual(Dependency[\.intValue], 2)
     }
     
     func test_whenSettingDepenency_DependencyUpdated() {
-        Dependencies.set(\.intValue, 2)
+        Dependencies.inject(\.intValue, 2)
         XCTAssertEqual(Dependency[\.intValue], 2)
     }
 }
