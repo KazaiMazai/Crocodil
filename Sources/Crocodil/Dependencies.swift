@@ -9,7 +9,7 @@ import Foundation
 
 public struct Dependencies: Sendable {
     private init() { }
-    
+   
     /** A static subscript for updating the `currentValue` of `DependencyKey` instances. */
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey, Key.Value: Sendable {
         get {
@@ -37,7 +37,7 @@ public struct Dependencies: Sendable {
     }
 }
 
-
 fileprivate extension DispatchQueue {
     static let di = DispatchQueue(label: "com.crocodil.queue", attributes: .concurrent)
 }
+ 

@@ -61,10 +61,10 @@ struct PropertyAttributes {
 
 extension VariableDeclSyntax {
     func propertiesAttributes() -> PropertyAttributes? {
-        guard modifiers.first?.name.text != "static" else {
+        guard !modifiers.contains(where: { $0.name == "static" }) else {
             return nil
         }
-
+        
         for binding in bindings {
             guard let propertyName = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text,
                   let initializer = binding.initializer
