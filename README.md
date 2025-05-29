@@ -81,7 +81,7 @@ let time = currentTime()
 Swap out dependencies at runtime, perfect for unit tests:
 
 ```swift
-Dependencies.set(\.networkClient, NetworkClientMock())
+Dependencies.inject(\.networkClient, NetworkClientMock())
 ```
 
 ## Crocodil vs. SwiftUI's EnvironmentValues
