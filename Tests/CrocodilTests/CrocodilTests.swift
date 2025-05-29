@@ -5,10 +5,15 @@ extension Dependencies {
     @DependencyEntry var intValue: Int = 1
     @DependencyEntry var anotherIntValue: Int = Dependency[\.intValue] + 1
     @DependencyEntry var oneMoreIntValue: Int = Dependency[\.anotherIntValue] + 1
+    
+    
+    @DependencyEntry var value1: Int = Dependency[\.value2] + 1
+    @DependencyEntry var value2: Int = Dependency[\.value1] - 1
 }
  
 final class CrocodilTests: XCTestCase {
     @Dependency(\.intValue) var value
+     
     
     func test_whenDependencyProvided_CanBeAccessedViaProperyWrapper() {
         XCTAssertEqual(value, 1)

@@ -105,5 +105,5 @@ Crocodil’s DI container uses a dedicated concurrent queue with synchronization
 
 
 ## ⚠️ Limitations
-- **Circular Dependencies**: Crocodil cannot detect circular references yet.
+- **Circular Dependencies**: Crocodil cannot detect circular references during compile-time yet. 
 - **Dependency Safety**: While read/write access is synchronized, the injected instances are not automatically thread-safe.
