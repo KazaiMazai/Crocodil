@@ -84,10 +84,10 @@ Swap out dependencies at runtime, perfect for unit tests:
 Dependencies.inject(\.networkClient, NetworkClientMock())
 ```
 
-## Crocodil vs. SwiftUI's EnvironmentValues
+## Crocodil Injection vs. SwiftUI's EnvironmentValues
 
-| Feature           | SwiftUI EnvironmentValues   | Crocodil Dependencies           |
-|------------------|-----------------------------|---------------------------------|
+| Feature           | SwiftUI EnvironmentValues   | Crocodil Injection              |
+|-------------------|-----------------------------|---------------------------------|
 | Context           | SwiftUI-only                | Framework-agnostic              |
 | Propagation       | Passed down view hierarchy  | Globally accessible             |
 | View Re-rendering | Triggers updates            | Does **not** trigger updates    |
