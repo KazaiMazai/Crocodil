@@ -159,4 +159,6 @@ There are many other dependency injection libraries in the Swift, but only one o
 - [Weaver](https://github.com/scribd/Weaver)
 - [Dependencies](https://github.com/pointfreeco/swift-dependencies)
 
+## License
 
+This library is released under the MIT license. See [LICENSE](LICENSE) for details.
