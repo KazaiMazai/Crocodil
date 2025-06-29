@@ -1,5 +1,5 @@
 
-# 🐊💉 Crocodil — Lightweight Dependency Injection for Swift
+# 🐊💉 Crocodil — Dependency Injection Library for Swift
 
 Crocodil is a dependency injection (DI) library for Swift that provides a straightforward, boilerplate-free way to manage dependencies in your applications.
 
@@ -67,7 +67,8 @@ extension Dependencies {
 Use `@Dependency` to inject dependencies via key paths:
 
 ```swift
-struct ViewModel {
+@Observable
+class ViewModel {
     @Dependency(\.networkClient) var client
     @Dependency(\.userDefaultsStorage) var storage
 }
@@ -85,15 +86,17 @@ Swap out dependencies at runtime, perfect for unit tests:
 ```swift
 Dependencies.inject(\.networkClient, NetworkClientMock())
 ```
+## Examples
+### Effortless Singletons Replacement
 
-### Replace Your Singletons
-
+Replace your good old singletons with Swift 6 strict concurrency compatible alternative and never deal with nasty
+`Static property 'shared' is not concurrency-safe because it is nonisolated global shared mutable state` again:
 
 ```diff
 
-+extension Dependencies {
+extension Dependencies {
 +    @DependencyEntry var networkClient: ClientProtocol = NetworkClient()
-+}
+}
 
 class NetworkClient {
 -    static let shared: NetworkClient = NetworkClient()
@@ -113,13 +116,15 @@ class NetworkClient {
 | Thread Safety     | Limited                     | **Built-in concurrent safety**  |
 
 
-## Thread Safety
-Crocodil’s DI container uses a dedicated concurrent queue for access synchronization.
+## How does it work
+
+Crocodil provides a workaround to silence the Swift 6 concurrency warning by using `nonisolated(unsafe)` and syncronizes access to the variable via dedicated concurrent queue which makes access to the shared vaiable actually safe. Crocodil is designed in a way to make it impossible to access the variables directly in any unsafe way.
+ 
 
 > [!WARNING]
-> The DI container is thread-safe. However, the dependencies themselves must be made thread-safe by the developer.
+> Although access to the dependencies is syncronized and is thread-safe it doesn't make the dependencies themselves thread-safe or sendable. It's developer's respinsibiliy to make the injected things' internal state thread-safe.
 
 
 ## ⚠️ Limitations
-- **Circular Dependencies**: Crocodil cannot detect circular references during compile-time. 
+- **Circular Dependencies**: Crocodil cannot detect circular references. 
 - **Thread Safety**: While read/write access to the injected instances is synchronized, the injected instances are not automatically thread-safe.
