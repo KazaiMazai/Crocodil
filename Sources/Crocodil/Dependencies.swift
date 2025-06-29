@@ -11,6 +11,16 @@ public struct Dependencies: Sendable {
     private init() { }
    
     /** A static subscript for updating the `currentValue` of `DependencyKey` instances. */
+    public subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey {
+        get {
+            DispatchQueue.di.sync { key.instance }
+        }
+        set {
+            DispatchQueue.di.asyncUnsafe(flags: .barrier) { key.instance = newValue }
+        }
+    }
+    
+    /** A static subscript for updating the `currentValue` of `DependencyKey` instances. */
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey, Key.Value: Sendable {
         get {
             DispatchQueue.di.sync { key.instance }
@@ -21,13 +31,14 @@ public struct Dependencies: Sendable {
     }
 
     /** A static subscript accessor for updating and references dependencies directly. */
-    static subscript<T>(_ keyPath: WritableKeyPath<Self, T>) -> T {
+    static subscript<T>(_ keyPath: WritableKeyPath<Dependencies, T>) -> T {
         get {
-            Self()[keyPath: keyPath]
+            let dependencies = Dependencies()
+            return dependencies[keyPath: keyPath]
         }
         set {
-            var instance = Self()
-            instance[keyPath: keyPath] = newValue
+            var dependencies = Dependencies()
+            dependencies[keyPath: keyPath] = newValue
         }
     }
     

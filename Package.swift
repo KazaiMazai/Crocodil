@@ -8,7 +8,7 @@ let package = Package(
     name: "Crocodil",
     platforms: [
        .iOS(.v13),
-       .macOS(.v10_15),
+       .macOS(.v14),
        .tvOS(.v12),
        .watchOS(.v7)
 

@@ -45,7 +45,7 @@ public struct DependencyInjectionMacro: AccessorMacro, PeerMacro {
         return [
         """
         private enum _\(raw: propertiesAttributes.keyName): DependencyKey {
-            nonisolated(unsafe) static var instance \(propertiesAttributes.initializerClauseSyntax)
+            nonisolated(unsafe) static var instance \(raw: propertiesAttributes.initializerClause)
         }
         """
         ]
@@ -54,7 +54,13 @@ public struct DependencyInjectionMacro: AccessorMacro, PeerMacro {
 
 struct PropertyAttributes {
     let propertyName: String
+    let propertyType: TypeSyntax?
     let initializerClauseSyntax: InitializerClauseSyntax
+    
+    var initializerClause: String {
+        propertyType.map { ":\($0) \(initializerClauseSyntax)" } ?? "\(initializerClauseSyntax)"
+         
+    }
 
     var keyName: String { "\(propertyName.capitalized)Key" }
 }
@@ -68,16 +74,15 @@ extension VariableDeclSyntax {
         for binding in bindings {
             guard let propertyName = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text,
                   let initializer = binding.initializer
-
             else {
                 continue
             }
 
             return PropertyAttributes(
                 propertyName: propertyName,
+                propertyType: binding.typeAnnotation?.type,
                 initializerClauseSyntax: initializer
             )
-
         }
         return nil
     }

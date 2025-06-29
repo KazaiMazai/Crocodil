@@ -42,5 +42,36 @@ final class InjectedStoreMacroTests: XCTestCase {
               macros: macros
         )
     }
+    
+    func test_WhenDependencyEntryWithType_DepenencyInjectionKeyGeneratedWithExplicitType() {
+        let macros = ["DependencyEntry": DependencyInjectionMacro.self]
+            
+        assertMacroExpansion(
+              """
+              extension Dependencies {
+                  @DependencyEntry var value: Int = 10
+              }
+              """,
+              
+              expandedSource:
+                """
+                extension Dependencies {
+                    var value: Int {
+                        get {
+                            self[_ValueKey.self]
+                        }
+                        set {
+                            self[_ValueKey.self] = newValue
+                        }
+                    }
+
+                    private enum _ValueKey: DependencyKey {
+                        nonisolated(unsafe) static var instance : Int  = 10
+                    }
+                }
+                """,
+              macros: macros
+        )
+    }
 }
 #endif
