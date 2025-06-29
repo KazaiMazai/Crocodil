@@ -1,7 +1,13 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/KazaiMazai/Crocodil/blob/main/Docs/Resources/Logo-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/KazaiMazai/Crocodil/blob/main/Docs/Resources/Logo.svg">
+  <img src="https://github.com/KazaiMazai/Crocodil/blob/main/Docs/Resources/Logo.svg">
+</picture>
 
-# 🐊💉 Crocodil — Dependency Injection Library for Swift
+[![CI](https://github.com/KazaiMazai/Crocodil/workflows/Tests/badge.svg)](https://github.com/KazaiMazai/Crocodil/actions?query=workflow%3ATests)
 
-Crocodil is a dependency injection (DI) library for Swift that provides a straightforward, boilerplate-free way to manage dependencies in your applications.
+
+Crocodil is a dependency injection (DI) library for Swift that provides a straightforward, boilerplate-free way to register and access dependencies in your applications.
 
 
 ## Overview
@@ -24,25 +30,37 @@ DI enables easy mocking and stubbing. Crocodil makes swapping dependencies effor
 
 ## Why Crocodil Injection
 
-- **Inject Anything**
+- **Inject Anything**.
 Supports injection of enums, structs, classes, closures, and protocol conforming instances
 
-- **Compile-time Safety**
-Ensures key-path validity and detects missing dependencies during compilation. 
+- **Macro-powered Simplicity**. With @DependencyEntry`, Crocodil uses Swift macros to register and declare dependencies in one place.
 
-- **Swift Concurrency Compliant**
-Drop-in replacement for singletons, without triggering strict concurrency mode violations.
+- **Compile-time Safety**. Ensures key-path validity and detects missing dependencies during compilation. 
 
-- **Clean Property Injection**
-Uses @Dependency for clean and read-only property injection.
+- **Swift Concurrency Compliant**. Drop-in replacement for singletons, without triggering strict concurrency mode violations.
 
-- **Thread Safety**
-Built-in concurrency support with safe, synchronized access to dependencies.
+- **Clean Property Injection**. Uses @Dependency propery wrapper for clean and read-only dependency access.
 
-- **Macro-powered Simplicity**
-With @DependencyEntry`, Crocodil uses Swift macros to register and declare dependencies in one place.
+- **Thread Safety**. Built-in concurrency support with safe, synchronized access to dependencies.
+
+## Installation
+
+Using [Swift Package Manager](https://swift.org/package-manager/):
+
+```swift
+.package(url: "https://github.com/KazaiMazai/Crocodil.git", from: "0.1.0")
+``` 
+
+Or via Xcode:
+
+- File → Add Packages
+- Enter the URL:
+```
+https://github.com/KazaiMazai/Crocodil.git
+```
 
 ## Usage
+
 ### Registering Dependencies
 Declaration and registration happen in one shot, ensuring compile-time completeness:
 
@@ -81,12 +99,14 @@ let time = currentTime()
 ```
 
 ### Mocking Dependencies
+
 Swap out dependencies at runtime, perfect for unit tests:
 
 ```swift
 Dependencies.inject(\.networkClient, NetworkClientMock())
 ```
 ## Examples
+
 ### Effortless Singletons Replacement
 
 Replace your good old singletons with Swift 6 strict concurrency compatible alternative and never deal with nasty
@@ -116,7 +136,7 @@ class NetworkClient {
 | Thread Safety     | Limited                     | **Built-in concurrent safety**  |
 
 
-## How does it work
+## How Does It Work
 
 Crocodil provides a workaround to silence the Swift 6 concurrency warning by using `nonisolated(unsafe)` and syncronizes access to the variable via dedicated concurrent queue which makes access to the shared vaiable actually safe. Crocodil is designed in a way to make it impossible to access the variables directly in any unsafe way.
  
@@ -128,3 +148,15 @@ Crocodil provides a workaround to silence the Swift 6 concurrency warning by usi
 ## ⚠️ Limitations
 - **Circular Dependencies**: Crocodil cannot detect circular references. 
 - **Thread Safety**: While read/write access to the injected instances is synchronized, the injected instances are not automatically thread-safe.
+
+
+## Alternatives
+There are many other dependency injection libraries in the Swift, but only one of them is Crocodil
+
+- [Factory](https://github.com/hmlongco/Factory)
+- [Needle](https://github.com/uber/needle)
+- [Swinject](https://github.com/Swinject/Swinject)
+- [Weaver](https://github.com/scribd/Weaver)
+- [Dependencies](https://github.com/pointfreeco/swift-dependencies)
+
+
