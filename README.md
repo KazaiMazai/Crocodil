@@ -121,9 +121,10 @@ Dependencies.update(intValue: {
  
 ```
 
-> [!NOTICE]
+> [!NOTE]
 > Due to Swift macro limitations, atomic mutation is availave only for dependencies injected with explicitly declared type. 
 
+Declare type explicitly to enable code generation of atomic mutation func:
 ```diff
 extension Dependencies {
 -   @DependencyEntry var intValue = 0
@@ -133,20 +134,18 @@ extension Dependencies {
 ### Access Control Scopes
 
 Crocodil respects access control attributes allowing to naturally scope the dependencies instances.
+This will create and register 2 independent instances of dependencies. 
+Each will be accessed according to access control attributes:
 
 ```swift
-// This will create and register 2 independent instances of register dependencies. 
-// Each will be accessed according to access control attributes. 
-//
 //FileA.swift: 
 fileprivate extension Dependencies {
-    // Scope-limited lifecycle
-    @DependencyEntry var localService: Service()
+    @DependencyEntry var localService = Service()
 } 
  
 //FileB.swift:
 fileprivate extension Dependencies {
-    @DependencyEntry var localService: Service()
+    @DependencyEntry var localService = Service()
 } 
 ```
 
@@ -188,6 +187,15 @@ class NetworkClient {
 ```
 
 
+## How Does It Work
+
+Crocodil provides a workaround to silence the Swift 6 concurrency warning by using `nonisolated(unsafe)` and syncronizes access to the variable via dedicated concurrent queue which makes access to the shared vaiable actually safe. 
+Crocodil is designed in a way to make it impossible to access the variables directly in any unsafe way.
+ 
+
+> [!WARNING]
+> Although access to the dependencies is syncronized and is thread-safe it doesn't make the dependencies themselves thread-safe or sendable. It's developer's respinsibiliy to make the injected things' internal state thread-safe.
+
 
 ## Crocodil Injection vs. SwiftUI's EnvironmentValues
 
@@ -201,20 +209,24 @@ class NetworkClient {
 | Thread Safety     | Limited                     | **Built-in concurrent safety**  |
 
 
-## How Does It Work
-
-Crocodil provides a workaround to silence the Swift 6 concurrency warning by using `nonisolated(unsafe)` and syncronizes access to the variable via dedicated concurrent queue which makes access to the shared vaiable actually safe. 
-Crocodil is designed in a way to make it impossible to access the variables directly in any unsafe way.
- 
-
-> [!WARNING]
-> Although access to the dependencies is syncronized and is thread-safe it doesn't make the dependencies themselves thread-safe or sendable. It's developer's respinsibiliy to make the injected things' internal state thread-safe.
-
 
 ## ⚠️ Limitations
 
-- **Circular Dependencies**: Crocodil cannot detect circular references. 
-- **Thread Safety**: While read/write access to the injected instances is synchronized, the injected instances are not automatically thread-safe.
+### Circular Dependencies
+
+Crocodil cannot detect circular references. Accessing Dependency within another dependency declaration should be made with extra care or avoided.
+
+```swift
+extension Dependencies {
+    // Be aware of circular references. They are possible and will lead to a crash:
+    @DependencyEntry var service = Service(Dependency[\.anotherService])
+    @DependencyEntry var anotherService = AnotherService(Dependency[\.service]) 
+}
+```
+
+ ### Thread Safety
+ 
+ While read/write access to the injected instances is synchronized, the injected instances themselves are not automatically thread-safe.
 
 
 ## Alternatives
