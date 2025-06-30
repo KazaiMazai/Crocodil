@@ -37,7 +37,10 @@ fileprivate extension Dependencies {
     @DependencyEntry var lazyStringValue = { "I'm lazy!" }()
     
     // Closure injection
-    @DependencyEntry var closure: @Sendable () -> Date = { Date.distantPast }
+    @DependencyEntry var currentTime: @Sendable () -> Date = { Date.distantPast }
+    
+    // Call injected closure
+    var now: Date { currentTime() }
     
     // Instance conforming to protocol
     @DependencyEntry var protocolConformingInstance: ClientProcotol = Client(endpoint: "www.google.com")
@@ -58,14 +61,14 @@ final class DependenciesTests: XCTestCase {
     //Instance with explicit type
     @Dependency(\.stringValue) var stringValue
     @Dependency(\.lazyStringValue) var lazyStringValue
-    @Dependency(\.closure) var closure
+    @Dependency(\.now) var now
     @Dependency(\.protocolConformingInstance) var client: ClientProcotol
     
     func test_whenDependencyProvided_CanBeAccessedViaProperyWrapper() {
         XCTAssertEqual(intValue, 1)
         XCTAssertEqual(stringValue, "I'm a string!")
         XCTAssertEqual(lazyStringValue, "I'm lazy!")
-        XCTAssertEqual(closure(), .distantPast)
+        XCTAssertEqual(now, .distantPast)
         XCTAssertEqual(client.endpoint, "www.google.com")
     }
      

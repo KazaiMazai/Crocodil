@@ -47,7 +47,7 @@ public extension Dependencies {
 }
 
 extension Dependencies {
-    static subscript<Value>(_ keyPath: WritableKeyPath<Dependencies, Value>) -> Value {
+    static subscript<Value>(_ keyPath: KeyPath<Dependencies, Value>) -> Value {
         Dependencies()[keyPath: keyPath]
     }
 }

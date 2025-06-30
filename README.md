@@ -75,8 +75,10 @@ extension Dependencies {
     // Register lazily initialized instance
     @DependencyEntry var lazyService = { Service() }()
 
-    // Register closure
-    @DependencyEntry var now = { Date() }
+    // Register closure 
+    @DependencyEntry var currentTime: @Sendable () -> Date = { Date.now }
+    
+    var now: Date { currentTime() }
 }
 ```
 
@@ -89,13 +91,13 @@ Use `@Dependency` to inject dependencies via key paths:
 class ViewModel {
     @Dependency(\.networkClient) var client
     @Dependency(\.userDefaultsStorage) var storage
+    @Dependency(\.now) var now
 }
 ```
 Or access dependencies directly:
 
 ```swift
 let currentTime = Dependency[\.now]
-let time = currentTime()
 ```
 
 ### Mocking Dependencies
@@ -104,6 +106,7 @@ Swap out dependencies at runtime, perfect for unit tests:
 
 ```swift
 Dependencies.inject(\.networkClient, NetworkClientMock())
+Dependencies.inject(\.currentTime, { Date.distantPast })
 ```
 
 ### Mutating Dependencies
