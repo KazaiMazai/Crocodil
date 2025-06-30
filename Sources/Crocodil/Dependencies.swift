@@ -13,6 +13,7 @@ public struct Dependencies: Sendable {
 
 public extension Dependencies {
     /** A static subscript for updating the `currentValue` of `DependencyKey` instances. */
+    @available(iOS 17.0, *)
     subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey {
         get {
             DispatchQueue.di.sync { key.instance }

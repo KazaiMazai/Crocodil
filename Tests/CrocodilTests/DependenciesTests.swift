@@ -19,7 +19,7 @@ fileprivate extension Dependencies {
     // Injected instance with explicit type
     @DependencyEntry var intValue: Int = 1
     
-    @DependencyEntry var nextAutoIncremented = {
+    @DependencyEntry var nextAutoIncremented: @Sendable () -> Int = {
         Dependencies.update(intValue: {
             $0 += 1
         })
@@ -37,12 +37,10 @@ fileprivate extension Dependencies {
     @DependencyEntry var lazyStringValue = { "I'm lazy!" }()
     
     // Closure injection
-    @DependencyEntry var closure = { Date.distantPast }
+    @DependencyEntry var closure: @Sendable () -> Date = { Date.distantPast }
     
     // Instance conforming to protocol
     @DependencyEntry var protocolConformingInstance: ClientProcotol = Client(endpoint: "www.google.com")
-    
-    
 }
 
 protocol ClientProcotol: Sendable {
