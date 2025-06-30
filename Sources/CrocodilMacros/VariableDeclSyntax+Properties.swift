@@ -13,20 +13,20 @@ extension VariableDeclSyntax {
         guard !modifiers.contains(where: { $0.name == "static" }) else {
             return nil
         }
-        
-        var propertyInferredType: TypeSyntax? = nil
+
+        var propertyInferredType: TypeSyntax?
         if let firstBinding = bindings.first,
            let typeAnnotation = firstBinding.typeAnnotation {
             propertyInferredType = typeAnnotation.type
         }
-        
+
         for binding in bindings {
             guard let propertyName = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text,
                   let initializer = binding.initializer
             else {
                 continue
             }
-            
+
             return PropertyAttributes(
                 propertyName: propertyName,
                 propertyType: binding.typeAnnotation?.type,
@@ -37,7 +37,7 @@ extension VariableDeclSyntax {
         }
         return nil
     }
-    
+
     func accessAttribute() -> AccessAttribute {
         modifiers
             .compactMap { $0.name.text }

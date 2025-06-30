@@ -20,7 +20,7 @@ public struct DependencyInjectionMacro: AccessorMacro, PeerMacro {
         else {
             return []
         }
-        
+
         return [
           """
           get { self[_\(raw: propertiesAttributes.keyName).self] }
@@ -30,7 +30,7 @@ public struct DependencyInjectionMacro: AccessorMacro, PeerMacro {
           """
         ]
     }
-    
+
     public static func expansion(
         of node: SwiftSyntax.AttributeSyntax,
         providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
@@ -40,15 +40,15 @@ public struct DependencyInjectionMacro: AccessorMacro, PeerMacro {
             else {
                 return []
             }
-            
+
             let updateAtomically = try FunctionDeclSyntax.updateAtomically(propertiesAttributes)
             let dependencyKeyEnum = try SwiftSyntax.DeclSyntax.dependencyKeyEnum(propertiesAttributes)
-            
+
             return [
                 """
                 \(updateAtomically)
                 """,
-                
+
                 """
                 \(dependencyKeyEnum)
                 """
@@ -71,11 +71,11 @@ extension SwiftSyntax.DeclSyntax {
 extension FunctionDeclSyntax {
     static func updateAtomically(_ propertyAttributes: PropertyAttributes
     ) throws -> FunctionDeclSyntax? {
-        
+
         guard let propertyType = propertyAttributes.propertyInferredType else {
             return nil
         }
-        
+
         return try FunctionDeclSyntax(
         """
         \(raw: propertyAttributes.accessAttribute.name) static func update(
@@ -86,7 +86,3 @@ extension FunctionDeclSyntax {
         )
     }
 }
-
-
-
-

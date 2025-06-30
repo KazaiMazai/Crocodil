@@ -21,7 +21,7 @@ public extension Dependencies {
             DispatchQueue.di.asyncUnsafe(flags: .barrier) { key.instance = newValue }
         }
     }
-    
+
     /** A static subscript for updating the `currentValue` of `DependencyKey` instances. */
     subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey, Key.Value: Sendable {
         get {
@@ -31,30 +31,27 @@ public extension Dependencies {
             DispatchQueue.di.async(flags: .barrier) { key.instance = newValue }
         }
     }
-    
+
     static func inject<Value>(_ keyPath: WritableKeyPath<Self, Value>, _ value: Value) {
         var instance = Dependencies()
         instance[keyPath: keyPath] = value
     }
-    
+
     /** Updating the `currentValue` of `DependencyKey` instances atomically. */
     static func update<Key>(
         _ key: Key.Type,
         atomically: @Sendable @escaping (inout Key.Value) -> Void) where Key: DependencyKey {
-            
             DispatchQueue.di.async(flags: .barrier) { atomically(&key.instance) }
         }
 }
 
 extension Dependencies {
     static subscript<Value>(_ keyPath: WritableKeyPath<Dependencies, Value>) -> Value {
-        get {
-            Dependencies()[keyPath: keyPath]
-        }
+        Dependencies()[keyPath: keyPath]
     }
 }
 
 fileprivate extension DispatchQueue {
+    // swiftlint:disable:next identifier_name
     static let di = DispatchQueue(label: "com.crocodil.queue", attributes: .concurrent)
 }
-

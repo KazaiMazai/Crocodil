@@ -10,7 +10,8 @@ import Foundation
 /**
  A protocol that defines a key used for dependency injection.
 
- Types conforming to `DependencyKey` provide a mechanism to inject dependencies  by associating a specific type of value (`Value`) .
+ Types conforming to `DependencyKey` provide a mechanism
+ to inject dependencies  by associating a specific type of value (`Value`) .
  */
 public protocol DependencyKey {
     /** The associated type representing the type of the dependency injection key's value. */

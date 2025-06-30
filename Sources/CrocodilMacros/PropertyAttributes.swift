@@ -14,10 +14,10 @@ struct PropertyAttributes {
     let propertyInferredType: TypeSyntax?
     let initializerClauseSyntax: InitializerClauseSyntax
     let accessAttribute: AccessAttribute
-    
+
     var initializerClause: String {
         propertyType.map { ":\($0) \(initializerClauseSyntax)" } ?? "\(initializerClauseSyntax)"
     }
-    
+
     var keyName: String { "\(propertyName.capitalized)Key" }
 }
