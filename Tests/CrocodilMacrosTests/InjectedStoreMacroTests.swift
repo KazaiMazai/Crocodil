@@ -33,7 +33,9 @@ final class InjectedStoreMacroTests: XCTestCase {
                             self[_ValueKey.self] = newValue
                         }
                     }
-
+                
+                
+                
                     private enum _ValueKey: DependencyKey {
                         nonisolated(unsafe) static var instance = 10
                     }
@@ -49,14 +51,14 @@ final class InjectedStoreMacroTests: XCTestCase {
         assertMacroExpansion(
               """
               extension Dependencies {
-                  @DependencyEntry var value: Int = 10
+                  @DependencyEntry fileprivate var value: Int = 10
               }
               """,
               
               expandedSource:
                 """
                 extension Dependencies {
-                    var value: Int {
+                    fileprivate var value: Int {
                         get {
                             self[_ValueKey.self]
                         }
@@ -64,7 +66,12 @@ final class InjectedStoreMacroTests: XCTestCase {
                             self[_ValueKey.self] = newValue
                         }
                     }
-
+                
+                    fileprivate static func update(
+                        value atomically: @Sendable @escaping (inout Int ) -> Void) {
+                        update(_ValueKey.self, atomically: atomically)
+                    }
+                
                     private enum _ValueKey: DependencyKey {
                         nonisolated(unsafe) static var instance : Int  = 10
                     }

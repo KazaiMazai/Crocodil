@@ -8,10 +8,11 @@
 import XCTest
 import Crocodil
  
-extension Dependencies {
+fileprivate extension Dependencies {
     
     // Be aware of circular references. They are possible
-    @DependencyEntry var circularDependencyOne: Int = Dependency[\.circularDependencyTwo] + 1
+    @DependencyEntry private var circularDependencyOne: Int = Dependency[\.circularDependencyTwo] + 1
     @DependencyEntry var circularDependencyTwo: Int = Dependency[\.circularDependencyOne] - 1
     @DependencyEntry var circularDependencyThree: Int = Dependency[\.circularDependencyThree] - 1
 }
+

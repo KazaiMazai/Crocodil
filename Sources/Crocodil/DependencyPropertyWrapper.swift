@@ -8,18 +8,18 @@
 import Foundation
 
 @propertyWrapper
-public struct Dependency<T> {
-    private let keyPath: WritableKeyPath<Dependencies, T>
+public struct Dependency<Value>: Sendable {
+    private let keyPath: @Sendable () -> WritableKeyPath<Dependencies, Value>
 
-    public var wrappedValue: T {
-        get { Dependencies[keyPath] }
+    public var wrappedValue: Value {
+        get { Dependencies[keyPath()] }
     }
 
-    public init(_ keyPath: WritableKeyPath<Dependencies, T>) {
+    public init(_ keyPath: @Sendable @escaping @autoclosure () -> WritableKeyPath<Dependencies, Value>) {
         self.keyPath = keyPath
     }
     
-    public static subscript(_ keyPath: WritableKeyPath<Dependencies, T>) -> T {
+    public static subscript(_ keyPath: WritableKeyPath<Dependencies, Value>) -> Value {
         get {
             Dependencies[keyPath]
         }

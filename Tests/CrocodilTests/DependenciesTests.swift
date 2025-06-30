@@ -7,10 +7,28 @@
 
 import XCTest
 import Crocodil
+import Dispatch
 
-extension Dependencies {
+extension Int {
+    static func nextAutoIncremented() -> Int {
+        Dependency[\.nextAutoIncremented]()
+    }
+}
+
+fileprivate extension Dependencies {
     // Injected instance with explicit type
     @DependencyEntry var intValue: Int = 1
+    
+    @DependencyEntry var nextAutoIncremented = {
+        Dependencies.update(intValue: {
+            $0 += 1
+        })
+        
+        return Dependency[\.intValue]
+    }
+    
+    // Injected instance with explicit type
+    @DependencyEntry private var privateIntValue: Int = 1
     
     // Injected instance with implicit type inference
     @DependencyEntry var stringValue = "I'm a string!"
@@ -23,6 +41,8 @@ extension Dependencies {
     
     // Instance conforming to protocol
     @DependencyEntry var protocolConformingInstance: ClientProcotol = Client(endpoint: "www.google.com")
+    
+    
 }
 
 protocol ClientProcotol: Sendable {
@@ -61,6 +81,7 @@ final class DependenciesTests: XCTestCase {
     func test_whenSettingDepenency_DependencyUpdated() {
         Dependencies.inject(\.intValue, 2)
         XCTAssertEqual(Dependency[\.intValue], 2)
+        
     }
 }
 

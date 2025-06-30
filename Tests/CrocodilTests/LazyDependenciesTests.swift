@@ -7,7 +7,7 @@
 import XCTest
 import Crocodil
  
-extension Dependencies {
+fileprivate extension Dependencies {
     @DependencyEntry var lazyDependencyInstantiationCount: Int = 0
     
     @DependencyEntry var lazyDepencency: String = {

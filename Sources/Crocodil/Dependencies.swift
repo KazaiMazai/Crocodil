@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Sergey Kazakov on 17/09/2024.
 //
@@ -9,9 +9,11 @@ import Foundation
 
 public struct Dependencies: Sendable {
     private init() { }
-   
+}
+
+public extension Dependencies {
     /** A static subscript for updating the `currentValue` of `DependencyKey` instances. */
-    public subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey {
+    subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey {
         get {
             DispatchQueue.di.sync { key.instance }
         }
@@ -21,7 +23,7 @@ public struct Dependencies: Sendable {
     }
     
     /** A static subscript for updating the `currentValue` of `DependencyKey` instances. */
-    public subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey, Key.Value: Sendable {
+    subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey, Key.Value: Sendable {
         get {
             DispatchQueue.di.sync { key.instance }
         }
@@ -29,26 +31,30 @@ public struct Dependencies: Sendable {
             DispatchQueue.di.async(flags: .barrier) { key.instance = newValue }
         }
     }
-
-    /** A static subscript accessor for updating and references dependencies directly. */
-    static subscript<T>(_ keyPath: WritableKeyPath<Dependencies, T>) -> T {
-        get {
-            let dependencies = Dependencies()
-            return dependencies[keyPath: keyPath]
-        }
-        set {
-            var dependencies = Dependencies()
-            dependencies[keyPath: keyPath] = newValue
-        }
+    
+    static func inject<Value>(_ keyPath: WritableKeyPath<Self, Value>, _ value: Value) {
+        var instance = Dependencies()
+        instance[keyPath: keyPath] = value
     }
     
-    public static func inject<T>(_ keyPath: WritableKeyPath<Self, T>, _ value: T) {
-        var instance = Self()
-        instance[keyPath: keyPath] = value
+    /** Updating the `currentValue` of `DependencyKey` instances atomically. */
+    static func update<Key>(
+        _ key: Key.Type,
+        atomically: @Sendable @escaping (inout Key.Value) -> Void) where Key: DependencyKey {
+            
+            DispatchQueue.di.async(flags: .barrier) { atomically(&key.instance) }
+        }
+}
+
+extension Dependencies {
+    static subscript<Value>(_ keyPath: WritableKeyPath<Dependencies, Value>) -> Value {
+        get {
+            Dependencies()[keyPath: keyPath]
+        }
     }
 }
 
 fileprivate extension DispatchQueue {
     static let di = DispatchQueue(label: "com.crocodil.queue", attributes: .concurrent)
 }
- 
+
