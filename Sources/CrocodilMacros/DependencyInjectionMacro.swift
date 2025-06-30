@@ -35,16 +35,14 @@ public struct DependencyInjectionMacro: AccessorMacro, PeerMacro {
         of node: SwiftSyntax.AttributeSyntax,
         providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext) throws -> [SwiftSyntax.DeclSyntax] {
-  
-
             guard let variableDeclaration = declaration.as(VariableDeclSyntax.self),
                   let propertiesAttributes = variableDeclaration.propertiesAttributes()
             else {
                 return []
             }
             
-            let updateAtomically: FunctionDeclSyntax? = try FunctionDeclSyntax.updateAtomically(propertiesAttributes)
-            let dependencyKeyEnum: SwiftSyntax.DeclSyntax = try SwiftSyntax.DeclSyntax.dependencyKeyEnum(propertiesAttributes)
+            let updateAtomically = try FunctionDeclSyntax.updateAtomically(propertiesAttributes)
+            let dependencyKeyEnum = try SwiftSyntax.DeclSyntax.dependencyKeyEnum(propertiesAttributes)
             
             return [
                 """
@@ -55,7 +53,6 @@ public struct DependencyInjectionMacro: AccessorMacro, PeerMacro {
                 \(dependencyKeyEnum)
                 """
             ]
-             
         }
 }
 
@@ -91,71 +88,5 @@ extension FunctionDeclSyntax {
 }
 
 
-struct PropertyAttributes {
-    let propertyName: String
-    let propertyType: TypeSyntax?
-    let propertyInferredType: TypeSyntax?
-    let initializerClauseSyntax: InitializerClauseSyntax
-    let accessAttribute: AccessAttribute
-    
-    var initializerClause: String {
-        propertyType.map { ":\($0) \(initializerClauseSyntax)" } ?? "\(initializerClauseSyntax)"
-        
-    }
-    
-    var keyName: String { "\(propertyName.capitalized)Key" }
-}
 
-extension VariableDeclSyntax {
-    func propertiesAttributes() -> PropertyAttributes? {
-        guard !modifiers.contains(where: { $0.name == "static" }) else {
-            return nil
-        }
-        
-        var propertyInferredType: TypeSyntax? = nil
-        if let firstBinding = bindings.first,
-           let typeAnnotation = firstBinding.typeAnnotation {
-            
-            propertyInferredType = typeAnnotation.type
-        }
-        
-        
-        for binding in bindings {
-            guard let propertyName = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text,
-                  let initializer = binding.initializer
-            else {
-                continue
-            }
-            
-            return PropertyAttributes(
-                propertyName: propertyName,
-                propertyType: binding.typeAnnotation?.type,
-                propertyInferredType: propertyInferredType,
-                initializerClauseSyntax: initializer,
-                accessAttribute: accessAttribute()
-            )
-        }
-        return nil
-    }
-    
-    
-    func accessAttribute() -> AccessAttribute {
-        modifiers
-            .compactMap { $0.name.text }
-            .compactMap { AccessAttribute(rawValue: $0) }
-            .first ?? .missingAttribute
-    }
-}
 
-enum AccessAttribute: String {
-    case `private`
-    case `fileprivate`
-    case `internal`
-    case `public`
-    case `open`
-    case missingAttribute = ""
-
-    var name: String {
-        rawValue
-    }
-}
