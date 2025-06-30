@@ -62,7 +62,7 @@ https://github.com/KazaiMazai/Crocodil.git
 ## Usage
 
 ### Registering Dependencies
-Declaration and registration happen in one shot, ensuring compile-time completeness:
+Declaration and registration happen in one shot. The variable name then acts as a keypath-based key ensuring compile-time completeness:
 
 ```swift
 extension Dependencies {
@@ -168,8 +168,6 @@ This allows to design any kind of dependency lifecycle:
  } 
 ```
  
-
-
 ## Examples
 
 ### Effortless Singletons Replacement
@@ -214,12 +212,14 @@ Crocodil is designed in a way to make it impossible to access the variables dire
 
 
 ## ⚠️ Limitations
+
 - **Circular Dependencies**: Crocodil cannot detect circular references. 
 - **Thread Safety**: While read/write access to the injected instances is synchronized, the injected instances are not automatically thread-safe.
 
 
 ## Alternatives
-There are many other dependency injection libraries in the Swift, but only one of them is Crocodil
+
+There are many dependency injection libraries in the Swift, but only one of them is Crocodil
 
 - [Factory](https://github.com/hmlongco/Factory)
 - [Needle](https://github.com/uber/needle)
