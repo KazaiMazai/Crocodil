@@ -23,53 +23,43 @@ import Foundation
  The main container `Dependencies` already conforms to this protocol. You can also create custom containers:
 
  ```swift
- struct Environment: Container {
+ struct AppFeatures: Container {
      init() { }
      
-     @DependencyEntry var developerMode: Bool = false
+     @DependencyEntry var newOnboarding: Bool = false
  }
  ```
 
  ## Accessing Dependencies
 
- Use `InjectableKeyPath` type alias to create property wrappers for your custom container:
+ Use `InjectableKeyPath` typealias to create property wrappers for your custom container:
 
  ```swift
- typealias Feature<Value> = InjectableKeyPath<Environment, Value>
+ typealias Feature<Value> = InjectableKeyPath<AppFeatures, Value>
 
- @Observable
  class ViewModel {
-     @Feature(\.developerMode) var developerMode
+     @Feature(\.newOnboarding) var newOnboarding
  }
  ```
 
  Or access dependencies directly using subscript syntax:
 
  ```swift
- let isDevMode = Environment[\.developerMode]
+ let isNewOnboarding = AppFeatures[\.newOnboarding]
  ```
 
  ## Injecting Dependencies
 
- Replace dependencies at runtime, perfect for testing:
+ Replace dependencies at runtime:
 
  ```swift
- Environment.inject(\.developerMode, true)
+ AppFeatures.inject(\.newOnboarding, true)
  ```
 
- ## Key Features
-
- - **Static Access**: Use subscript syntax to access dependencies without creating container instances
- - **Runtime Injection**: Inject dependencies at runtime using writable key paths
- - **Type Safety**: Leverages Swift's type system for compile-time safety
- - **Injectable Integration**: Works seamlessly with the `Injectable` protocol and `@DependencyEntry` macro
  */
 public protocol Container: Injectable {
     /**
-     Creates a new instance of the container.
-
-     This initializer should be implemented to set up the container with any required
-     configuration, if needed.
+     This initializer should be implemented to set up the container.
      */
     init()
 }
@@ -103,12 +93,6 @@ extension Container {
      - Parameters:
        - keyPath: The writable key path to the dependency property
        - value: The new value to inject
-
-     ## Example
-
-     ```swift
-     // Inject values for testing
-     Environment.inject(\.developerMode, true)
      ```
      */
     public static func inject<Value>(_ keyPath: WritableKeyPath<Self, Value>, _ value: Value) {

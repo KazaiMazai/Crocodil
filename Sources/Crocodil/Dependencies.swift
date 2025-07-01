@@ -7,6 +7,29 @@
 
 import Foundation
 
+/**
+ The `Dependencies` struct is the default container for dependencies in the Crocodil framework.
+
+ It conforms to the `Injectable` protocol, which allows for runtime injection of dependencies.
+
+ ## Usage
+
+ ## Example
+
+ extension Dependencies {
+    @DependencyEntry var apiClient: APIClient = APIClient()
+ }
+
+ ```swift
+ class ViewModel {
+     @Dependency(\.apiClient) var apiClient
+ }
+
+ let apiClient = Dependency[\.apiClient] 
+
+ Dependencies.inject(\.apiClient, MockAPIClient()) 
+ ```
+ */
 public struct Dependencies: Sendable {
     private init() { }
 }
