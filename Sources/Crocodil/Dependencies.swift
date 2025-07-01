@@ -7,8 +7,6 @@
 
 import Foundation
 
-public typealias Dependency<Value> = InjectableKeyPath<Dependencies, Value>
-
 public struct Dependencies: Sendable {
     private init() { }
 }

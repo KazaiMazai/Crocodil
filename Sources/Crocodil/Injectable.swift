@@ -7,13 +7,15 @@
 import Foundation
 
 public protocol Injectable {
+    /** A func for updating the dependency via container's `keyPath` */
     static func inject<Value>(_ keyPath: WritableKeyPath<Self, Value>, _ value: Value)
     
+    /** A subscript for accessing to dependency via container's `keyPath` */
     static subscript<Value>(_ keyPath: KeyPath<Self, Value>) -> Value { get }
 }
 
 public extension Injectable {
-    /** A static subscript for updating the dependency via `DependencyKey`. */
+    /** A subscript for read/write access to the dependency via `DependencyKey`. */
     @available(iOS 17.0, *)
     subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey {
         get {
@@ -24,7 +26,7 @@ public extension Injectable {
         }
     }
 
-    /** A static subscript for updating the sendable dependency via `DependencyKey` */
+    /** A subscript for read/write access to the sendable dependency via `DependencyKey` */
     subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey, Key.Value: Sendable {
         get {
             DispatchQueue.di.sync { key.instance }
@@ -34,7 +36,7 @@ public extension Injectable {
         }
     }
 
-    /** A static func for updating the dependency via `DependencyKey` atomically */
+    /** A func for updating the dependency via `DependencyKey` atomically */
     static func update<Key>(
         _ key: Key.Type,
         atomically: @Sendable @escaping (inout Key.Value) -> Void)

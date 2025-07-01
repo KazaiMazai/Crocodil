@@ -19,6 +19,7 @@ public struct InjectableKeyPath<Root: Injectable, Value>: Sendable {
         self.keyPath = keyPath
     }
     
+    /** A subscript for accessing the dependency via container's `keyPath` */
     public static subscript(_ keyPath: KeyPath<Root, Value>) -> Value {
         Root[keyPath]
     }
