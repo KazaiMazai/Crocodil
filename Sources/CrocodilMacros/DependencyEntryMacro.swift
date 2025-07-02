@@ -9,7 +9,7 @@ import Foundation
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public struct DependencyInjectionMacro: AccessorMacro, PeerMacro {
+public struct DependencyEntryMacro: AccessorMacro, PeerMacro {
     public static func expansion(
         of node: AttributeSyntax,
         providingAccessorsOf declaration: some DeclSyntaxProtocol,
