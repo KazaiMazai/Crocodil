@@ -22,7 +22,7 @@ fileprivate extension CustomContainerDependenciesTests {
 
 final class CustomContainerDependenciesTests: XCTestCase {
     @Feature(\.developerMode) var developerMode
-    
+     
     override func setUp() {
         Environment.inject(\.developerMode, false)
     }

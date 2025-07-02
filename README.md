@@ -221,15 +221,15 @@ AppFeatures.inject(\.newOnboarding, true)
 - **Testing**: Create test-specific containers for isolated testing scenarios
 
 ```swift
-// Test container for accessing testing instences
-struct TestDependencies: Container {
+// Test container for accessing mock instances
+struct MockDependencies: Container {
     init() { }
     
     @DependencyEntry var networkClient: NetworkClientProtocol = { MockNetworkClient() }()
     @DependencyEntry var analytics: AnalyticsProtocol = { MockAnalytics() }()
 }
 
-typealias Mock<Value> = InjectableKeyPath<TestDependencies, Value>
+typealias Mock<Value> = InjectableKeyPath<MockDependencies, Value>
 
 //Inject before testing:
 
@@ -258,8 +258,8 @@ class NetworkClient {
 
 ## How Does It Work
 
-Crocodil provides a workaround to silence the Swift 6 concurrency warning by using `nonisolated(unsafe)` and syncronizes access to the variable via dedicated concurrent queue which makes access to the shared vaiable actually safe. 
-Crocodil is designed in a way to make it impossible to access the variables directly in any unsafe way.
+Crocodil provides a workaround to silence the Swift 6 concurrency warning by using `nonisolated(unsafe)` and syncronizes access to the variable via dedicated concurrent queue which makes access to the shared variable actually safe. 
+Crocodil is designed in a way to make it impossible to access or mutate the global var directly in any unsafe way.
  
 
 > [!WARNING]

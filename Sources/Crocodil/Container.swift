@@ -59,12 +59,13 @@ import Foundation
  */
 public protocol Container: Injectable {
     /**
-     This initializer should be implemented to set up the container.
+     This initializer should be implemented to use the container.
      */
     init()
 }
 
 extension Container {
+    
     /**
      Accesses a dependency using a key path
 
