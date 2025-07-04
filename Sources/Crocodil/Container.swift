@@ -55,47 +55,17 @@ import Foundation
  ```swift
  AppFeatures.inject(\.newOnboarding, true)
  ```
-
  */
 public protocol Container: Injectable {
-    /**
-     This initializer should be implemented to use the container.
-     */
+   
     init()
 }
 
 extension Container {
-    
-    /**
-     Accesses a dependency using a key path
-
-     This subscript allows you to access dependencies directly on the container type,
-     providing a convenient way to retrieve dependencies..
-
-     - Parameter keyPath: The key path to the dependency property
-     - Returns: The dependency value
-
-     ## Example
-
-     ```swift
-     let isDevMode = Environment[\.developerMode]
-     ```
-     */
     public static subscript<Value>(_ keyPath: KeyPath<Self, Value>) -> Value {
         Self()[keyPath: keyPath]
     }
 
-    /**
-     Injects a dependency at runtime using a writable key path.
-
-     This method allows you to replace dependencies at runtime, which is useful for
-     testing scenarios or dynamic dependency configuration.
-
-     - Parameters:
-       - keyPath: The writable key path to the dependency property
-       - value: The new value to inject
-     ```
-     */
     public static func inject<Value>(_ keyPath: WritableKeyPath<Self, Value>, _ value: Value) {
         var instance = Self()
         instance[keyPath: keyPath] = value

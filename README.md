@@ -183,14 +183,14 @@ struct AppFeatures: Container {
     init() { }
     
     @DependencyEntry var newOnboarding: Bool = false
-    @DependencyEntry var experimentalFeatures: Bool = true
+    @DependencyEntry var experimentalFeature: Bool = true
     @DependencyEntry var analyticsEnabled: Bool = true
 }
 ```
 
 #### Accessing Custom Container Dependencies
 
-Use `InjectableKeyPath` typealias to create property wrappers for your custom container:
+Create typealias to access dependencies from custom container via `InjectableKeyPath`:
 
 ```swift
 typealias Feature<Value> = InjectableKeyPath<AppFeatures, Value>
@@ -218,7 +218,7 @@ AppFeatures.inject(\.newOnboarding, true)
 
 - **Feature Flags**: Group feature flags and experimental features
 - **Module-specific Dependencies**: Separate dependencies by app modules
-- **Testing**: Create test-specific containers for isolated testing scenarios
+- **Testing**: Create test-specific containers for mock instances
 
 ```swift
 // Test container for accessing mock instances
