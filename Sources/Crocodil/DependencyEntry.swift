@@ -11,5 +11,5 @@ import Foundation
 @attached(peer, names: arbitrary)
 public macro DependencyEntry() =
   #externalMacro(
-    module: "CrocodilMacros", type: "DependencyInjectionMacro"
+    module: "CrocodilMacros", type: "DependencyEntryMacro"
   )

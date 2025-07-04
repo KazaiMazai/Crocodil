@@ -7,52 +7,40 @@
 
 import Foundation
 
+/**
+ The `Dependencies` struct is the default container for dependencies in the Crocodil framework.
+
+ It conforms to the `Injectable` protocol, which allows for runtime injection of dependencies.
+
+ ## Usage
+
+ ## Example
+
+ extension Dependencies {
+    @DependencyEntry var apiClient: APIClient = APIClient()
+ }
+
+ ```swift
+ class ViewModel {
+     @Dependency(\.apiClient) var apiClient
+ }
+
+ let apiClient = Dependency[\.apiClient] 
+
+ Dependencies.inject(\.apiClient, MockAPIClient()) 
+ ```
+ */
 public struct Dependencies: Sendable {
     private init() { }
 }
 
-public extension Dependencies {
-    /** A static subscript for updating the `currentValue` of `DependencyKey` instances. */
-    @available(iOS 17.0, *)
-    subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey {
-        get {
-            DispatchQueue.di.sync { key.instance }
-        }
-        set {
-            DispatchQueue.di.asyncUnsafe(flags: .barrier) { key.instance = newValue }
-        }
-    }
-
-    /** A static subscript for updating the `currentValue` of `DependencyKey` instances. */
-    subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey, Key.Value: Sendable {
-        get {
-            DispatchQueue.di.sync { key.instance }
-        }
-        set {
-            DispatchQueue.di.async(flags: .barrier) { key.instance = newValue }
-        }
-    }
-
-    static func inject<Value>(_ keyPath: WritableKeyPath<Self, Value>, _ value: Value) {
+extension Dependencies: Injectable {
+    public static func inject<Value>(_ keyPath: WritableKeyPath<Self, Value>, _ value: Value) {
         var instance = Dependencies()
         instance[keyPath: keyPath] = value
     }
 
-    /** Updating the `currentValue` of `DependencyKey` instances atomically. */
-    static func update<Key>(
-        _ key: Key.Type,
-        atomically: @Sendable @escaping (inout Key.Value) -> Void) where Key: DependencyKey {
-            DispatchQueue.di.async(flags: .barrier) { atomically(&key.instance) }
-        }
-}
-
-extension Dependencies {
-    static subscript<Value>(_ keyPath: KeyPath<Dependencies, Value>) -> Value {
+    public static subscript<Value>(_ keyPath: KeyPath<Self, Value>) -> Value {
         Dependencies()[keyPath: keyPath]
     }
-}
-
-fileprivate extension DispatchQueue {
-    // swiftlint:disable:next identifier_name
-    static let di = DispatchQueue(label: "com.crocodil.queue", attributes: .concurrent)
 }

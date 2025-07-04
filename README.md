@@ -169,7 +169,74 @@ This allows to design any kind of dependency lifecycle:
     @DependencyEntry var now = { Date() }
  } 
 ```
- 
+
+### Custom Containers
+
+Crocodil supports creating custom dependency containers beyond the main `Dependencies` container. This is useful for organizing dependencies by feature, module, or any logical grouping.
+
+#### Creating a Custom Container
+
+To create a custom container, create a struct that conforms to the `Container` protocol:
+
+```swift
+struct AppFeatures: Container {
+    init() { }
+    
+    @DependencyEntry var newOnboarding: Bool = false
+    @DependencyEntry var experimentalFeature: Bool = true
+    @DependencyEntry var analyticsEnabled: Bool = true
+}
+```
+
+#### Accessing Custom Container Dependencies
+
+Create typealias to access dependencies from custom container via `InjectableKeyPath`:
+
+```swift
+typealias Feature<Value> = InjectableKeyPath<AppFeatures, Value>
+
+class ViewModel {
+    @Feature(\.newOnboarding) var newOnboarding
+}
+```
+
+Or access dependencies directly using subscript syntax:
+
+```swift
+let isNewOnboarding = Feature[\.newOnboarding]
+```
+
+#### Injecting Custom Container Dependencies
+
+Replace dependencies at runtime, just like with the main container:
+
+```swift
+AppFeatures.inject(\.newOnboarding, true)
+```
+
+#### Use Cases for Custom Containers
+
+- **Feature Flags**: Group feature flags and experimental features
+- **Module-specific Dependencies**: Separate dependencies by app modules
+- **Testing**: Create test-specific containers for mock instances
+
+```swift
+// Test container for accessing mock instances
+struct MockDependencies: Container {
+    init() { }
+    
+    @DependencyEntry var networkClient: NetworkClientProtocol = { MockNetworkClient() }()
+    @DependencyEntry var analytics: AnalyticsProtocol = { MockAnalytics() }()
+}
+
+typealias Mock<Value> = InjectableKeyPath<MockDependencies, Value>
+
+//Inject before testing:
+
+Dependencies.inject(\.networkClient, Mock[\.networkClient])
+Dependencies.inject(\.networkClient, Mock[\.analytics])
+```
+
 ## Examples
 
 ### Effortless Singletons Replacement
@@ -189,11 +256,10 @@ class NetworkClient {
 }
 ```
 
-
 ## How Does It Work
 
-Crocodil provides a workaround to silence the Swift 6 concurrency warning by using `nonisolated(unsafe)` and syncronizes access to the variable via dedicated concurrent queue which makes access to the shared vaiable actually safe. 
-Crocodil is designed in a way to make it impossible to access the variables directly in any unsafe way.
+Crocodil provides a workaround to silence the Swift 6 concurrency warning by using `nonisolated(unsafe)` and syncronizes access to the variable via dedicated concurrent queue which makes access to the shared variable actually safe. 
+Crocodil is designed in a way to make it impossible to access or mutate the global var directly in any unsafe way.
  
 
 > [!WARNING]
@@ -210,7 +276,6 @@ Crocodil is designed in a way to make it impossible to access the variables dire
 | Keys Mechanism    | Uses `EnvironmentKey`       | Uses `DependencyKey`            |
 | Macro             | `@Entry`                    | `@DependencyEntry`              |
 | Thread Safety     | Limited                     | **Built-in concurrent safety**  |
-
 
 
 ## ⚠️ Limitations
