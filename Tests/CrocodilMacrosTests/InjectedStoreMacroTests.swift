@@ -13,7 +13,7 @@ import XCTest
 
 final class InjectedStoreMacroTests: XCTestCase {
     func test_WhenDependencyEntry_DepenencyInjectionKeyGenerated() {
-        let macros = ["DependencyEntry": DependencyInjectionMacro.self]
+        let macros = ["DependencyEntry": DependencyEntryMacro.self]
             
         assertMacroExpansion(
               """
@@ -46,7 +46,7 @@ final class InjectedStoreMacroTests: XCTestCase {
     }
     
     func test_WhenDependencyEntryWithType_DepenencyInjectionKeyGeneratedWithExplicitType() {
-        let macros = ["DependencyEntry": DependencyInjectionMacro.self]
+        let macros = ["DependencyEntry": DependencyEntryMacro.self]
             
         assertMacroExpansion(
               """
