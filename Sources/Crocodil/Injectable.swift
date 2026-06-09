@@ -50,24 +50,26 @@ public extension Injectable {
         Self.queue.async(flags: .barrier) { atomically(&key.instance) }
     }
     
-    /** A func for updating the dependency via `DependencyKey` atomically */
-    static func update<Key>(
+    /** A func for updating the dependency via `DependencyKey` atomically.
+
+     The mutation closure may return a projection of the value (for example the
+     updated value), which is read under the same barrier and returned to the caller.
+     */
+    @discardableResult
+    static func update<Key, R: Sendable>(
         _ key: Key.Type,
-        atomically: @Sendable @escaping (inout Key.Value) throws -> Void) async throws
+        atomically: @Sendable @escaping (inout Key.Value) throws -> R) async throws -> R
     where
     Key: DependencyKey {
         try await withCheckedThrowingContinuation { continuation in
             Self.queue.async(flags: .barrier) {
                 do {
-                    try atomically(&key.instance)
-                    continuation.resume(returning: Void())
+                    continuation.resume(returning: try atomically(&key.instance))
                 } catch {
                     continuation.resume(throwing: error)
                 }
-                
             }
         }
-        
     }
 }
 
