@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Dependencies.swift
 //
 //
 //  Created by Sergey Kazakov on 17/09/2024.
