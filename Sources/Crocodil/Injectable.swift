@@ -7,6 +7,9 @@
 import Foundation
 
 public protocol Injectable {
+    
+    static var queue: DispatchQueue { get }
+    
     /** A func for updating the dependency via container's `keyPath` */
     static func inject<Value>(_ keyPath: WritableKeyPath<Self, Value>, _ value: Value)
     
@@ -15,24 +18,26 @@ public protocol Injectable {
 }
 
 public extension Injectable {
+    static var queue: DispatchQueue { DispatchQueue.di }
+    
     /** A subscript for read/write access to the dependency via `DependencyKey`. */
     @available(iOS 17.0, *)
     subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey {
         get {
-            DispatchQueue.di.sync { key.instance }
+            Self.queue.sync { key.instance }
         }
         set {
-            DispatchQueue.di.asyncUnsafe(flags: .barrier) { key.instance = newValue }
+            Self.queue.asyncUnsafe(flags: .barrier) { key.instance = newValue }
         }
     }
 
     /** A subscript for read/write access to the sendable dependency via `DependencyKey` */
     subscript<Key>(key: Key.Type) -> Key.Value where Key: DependencyKey, Key.Value: Sendable {
         get {
-            DispatchQueue.di.sync { key.instance }
+            Self.queue.sync { key.instance }
         }
         set {
-            DispatchQueue.di.async(flags: .barrier) { key.instance = newValue }
+            Self.queue.async(flags: .barrier) { key.instance = newValue }
         }
     }
 
@@ -42,7 +47,27 @@ public extension Injectable {
         atomically: @Sendable @escaping (inout Key.Value) -> Void)
     where
     Key: DependencyKey {
-        DispatchQueue.di.async(flags: .barrier) { atomically(&key.instance) }
+        Self.queue.async(flags: .barrier) { atomically(&key.instance) }
+    }
+    
+    /** A func for updating the dependency via `DependencyKey` atomically */
+    static func update<Key>(
+        _ key: Key.Type,
+        atomically: @Sendable @escaping (inout Key.Value) throws -> Void) async throws
+    where
+    Key: DependencyKey {
+        try await withCheckedThrowingContinuation { continuation in
+            Self.queue.async(flags: .barrier) {
+                do {
+                    try atomically(&key.instance)
+                    continuation.resume(returning: Void())
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+                
+            }
+        }
+        
     }
 }
 

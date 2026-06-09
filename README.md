@@ -33,7 +33,7 @@ DI enables easy mocking and stubbing. Crocodil makes swapping dependencies effor
 - **Inject Anything**.
 Supports injection of enums, structs, classes, closures, and protocol conforming instances
 
-- **Macro-powered Simplicity**. With @DependencyEntry`, Crocodil uses Swift macros to register and declare dependencies in one place.
+- **Macro-powered Simplicity**. With `@DependencyEntry`, Crocodil uses Swift macros to register and declare dependencies in one place.
 
 - **Compile-time Safety**. Ensures key-path validity and detects missing dependencies during compilation. 
 
@@ -124,8 +124,16 @@ Dependencies.update(intValue: {
  
 ```
 
+Updates can also be awaited and may throw, which is useful when the mutation needs to run as part of an `async` flow:
+
+```swift
+try await Dependencies.update(intValue: {
+    $0 += 1
+})
+```
+
 > [!NOTE]
-> Due to Swift macro limitations, atomic mutation is availave only for dependencies injected with explicitly declared type. 
+> Due to Swift macro limitations, atomic mutation is available only for dependencies injected with explicitly declared type. 
 
 Declare type explicitly to enable code generation of atomic mutation func:
 ```diff
@@ -214,6 +222,26 @@ Replace dependencies at runtime, just like with the main container:
 AppFeatures.inject(\.newOnboarding, true)
 ```
 
+#### Overriding the Synchronization Queue
+
+By default every container synchronizes access through a shared concurrent queue. A container can override the `queue` property to route all reads, writes, and atomic updates through a queue of its choosing — for example, to isolate a container's dependencies on a dedicated concurrent queue:
+
+```swift
+struct FeatureContainer: Container {
+    init() { }
+
+    static let queue = DispatchQueue(
+        label: "com.myapp.feature",
+        attributes: .concurrent
+    )
+
+    @DependencyEntry var value: Int = 0
+}
+```
+
+> [!WARNING]
+> Keep the override queue concurrent. Routing access through a serial queue (such as `.main`) and then reading or injecting synchronously from that same queue will deadlock. Prefer the `async`/`await` update API in that case.
+
 #### Use Cases for Custom Containers
 
 - **Feature Flags**: Group feature flags and experimental features
@@ -234,7 +262,7 @@ typealias Mock<Value> = InjectableKeyPath<MockDependencies, Value>
 //Inject before testing:
 
 Dependencies.inject(\.networkClient, Mock[\.networkClient])
-Dependencies.inject(\.networkClient, Mock[\.analytics])
+Dependencies.inject(\.analytics, Mock[\.analytics])
 ```
 
 ## Examples
@@ -258,12 +286,12 @@ class NetworkClient {
 
 ## How Does It Work
 
-Crocodil provides a workaround to silence the Swift 6 concurrency warning by using `nonisolated(unsafe)` and syncronizes access to the variable via dedicated concurrent queue which makes access to the shared variable actually safe. 
+Crocodil provides a workaround to silence the Swift 6 concurrency warning by using `nonisolated(unsafe)` and synchronizes access to the variable via a dedicated concurrent queue which makes access to the shared variable actually safe. 
 Crocodil is designed in a way to make it impossible to access or mutate the global var directly in any unsafe way.
  
 
 > [!WARNING]
-> Although access to the dependencies is syncronized and is thread-safe it doesn't make the dependencies themselves thread-safe or sendable. It's developer's respinsibiliy to make the injected things' internal state thread-safe.
+> Although access to the dependencies is synchronized and is thread-safe it doesn't make the dependencies themselves thread-safe or sendable. It's the developer's responsibility to make the injected things' internal state thread-safe.
 
 
 ## Crocodil Injection vs. SwiftUI's EnvironmentValues
