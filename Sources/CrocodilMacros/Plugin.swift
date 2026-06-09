@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Plugin.swift
 //  
 //
 //  Created by Sergey Kazakov on 25/08/2024.
