@@ -39,7 +39,7 @@ Supports injection of enums, structs, classes, closures, and protocol conforming
 
 - **Swift Concurrency Compliant**. Drop-in replacement for singletons, without triggering strict concurrency mode violations.
 
-- **Clean Property Injection**. Uses @Dependency propery wrapper for clean and read-only dependency access.
+- **Clean Property Injection**. Uses `@Dependency` property wrapper for clean and read-only dependency access.
 
 - **Thread Safety**. Built-in concurrency support with safe, synchronized access to dependencies.
 
@@ -111,7 +111,7 @@ Dependencies.inject(\.currentTime, { Date.distantPast })
 
 ### Mutating Dependencies
 
- Crocodil allows to mutate dependencies atomically:
+ Crocodil allows you to mutate dependencies atomically:
  
 ```swift
 extension Dependencies {
@@ -144,7 +144,7 @@ extension Dependencies {
 ```
 ### Access Control Scopes
 
-Crocodil respects access control attributes allowing to naturally scope the dependencies instances.
+Crocodil respects access control attributes allowing you to naturally scope the dependency instances.
 This will create and register 2 independent instances of dependencies. 
 Each will be accessed according to access control attributes:
 
@@ -198,7 +198,7 @@ struct AppFeatures: Container {
 
 #### Accessing Custom Container Dependencies
 
-Create typealias to access dependencies from custom container via `InjectableKeyPath`:
+Create a typealias to access dependencies from a custom container via `InjectableKeyPath`:
 
 ```swift
 typealias Feature<Value> = InjectableKeyPath<AppFeatures, Value>
@@ -327,7 +327,7 @@ extension Dependencies {
 
 ## Alternatives
 
-There are many dependency injection libraries in the Swift, but only one of them is Crocodil
+There are many dependency injection libraries in Swift, but only one of them is Crocodil
 
 - [Factory](https://github.com/hmlongco/Factory)
 - [Needle](https://github.com/uber/needle)
