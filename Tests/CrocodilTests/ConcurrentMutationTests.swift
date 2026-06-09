@@ -16,6 +16,7 @@ fileprivate extension Dependencies {
 final class ConcurrentMutationTests: XCTestCase {
     
     func test_whenUpdatedAtomically_DependencyUpdatedCorrectly() {
+        Dependencies.inject(\.intValue, 0)
         let concurrentQueue = DispatchQueue(label: "", attributes: .concurrent)
         let count = 10000
 
@@ -51,6 +52,29 @@ final class ConcurrentMutationTests: XCTestCase {
         }
 
         XCTAssertEqual(Dependency[\.intValue], count)
+    }
+
+    func test_whenAsyncUpdateReturnsValue_ThenUpdatedValueIsReturnedAtomically() async throws {
+        Dependencies.inject(\.intValue, 41)
+
+        let newValue = try await Dependencies.update(intValue: { value -> Int in
+            value += 1
+            return value
+        })
+
+        XCTAssertEqual(newValue, 42)
+    }
+
+    func test_whenAsyncUpdateReturnsValue_ThenPreviousValueCanBeReturned() async throws {
+        Dependencies.inject(\.intValue, 7)
+
+        let previous = try await Dependencies.update(intValue: { value -> Int in
+            defer { value += 1 }
+            return value
+        })
+
+        XCTAssertEqual(previous, 7)
+        XCTAssertEqual(Dependency[\.intValue], 8)
     }
 
     func test_whenAsyncUpdateThrows_ThenErrorIsPropagated() async {

@@ -72,8 +72,9 @@ final class InjectedStoreMacroTests: XCTestCase {
                         update(_SomeValueKey.self, atomically: atomically)
                     }
 
-                    fileprivate static func update(
-                    someValue atomically: @Sendable @escaping (inout Int ) throws -> Void) async throws {
+                    @discardableResult
+                    fileprivate static func update<R: Sendable>(
+                    someValue atomically: @Sendable @escaping (inout Int ) throws -> R) async throws -> R {
                         try await update(_SomeValueKey.self, atomically: atomically)
                     }
 

@@ -83,8 +83,9 @@ extension FunctionDeclSyntax {
             update(_\(raw: propertyAttributes.keyName).self, atomically: atomically)
         }
         
-        \(raw: propertyAttributes.accessAttribute.name) static func update(
-        \(raw: propertyAttributes.propertyName) atomically: @Sendable @escaping (inout \(raw: propertyType)) throws -> Void) async throws {
+        @discardableResult
+        \(raw: propertyAttributes.accessAttribute.name) static func update<R: Sendable>(
+        \(raw: propertyAttributes.propertyName) atomically: @Sendable @escaping (inout \(raw: propertyType)) throws -> R) async throws -> R {
             try await update(_\(raw: propertyAttributes.keyName).self, atomically: atomically)
         }
         """
