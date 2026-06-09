@@ -18,25 +18,25 @@ final class InjectedStoreMacroTests: XCTestCase {
         assertMacroExpansion(
               """
               extension Dependencies {
-                  @DependencyEntry var value = 10
+                  @DependencyEntry var someValue = 10
               }
               """,
-              
+
               expandedSource:
                 """
                 extension Dependencies {
-                    var value {
+                    var someValue {
                         get {
-                            self[_ValueKey.self]
+                            self[_SomeValueKey.self]
                         }
                         set {
-                            self[_ValueKey.self] = newValue
+                            self[_SomeValueKey.self] = newValue
                         }
                     }
-                
-                
-                
-                    private enum _ValueKey: DependencyKey {
+
+
+
+                    private enum _SomeValueKey: DependencyKey {
                         nonisolated(unsafe) static var instance = 10
                     }
                 }
@@ -51,33 +51,33 @@ final class InjectedStoreMacroTests: XCTestCase {
         assertMacroExpansion(
               """
               extension Dependencies {
-                  @DependencyEntry fileprivate var value: Int = 10
+                  @DependencyEntry fileprivate var someValue: Int = 10
               }
               """,
-              
+
               expandedSource:
                 """
                 extension Dependencies {
-                    fileprivate var value: Int {
+                    fileprivate var someValue: Int {
                         get {
-                            self[_ValueKey.self]
+                            self[_SomeValueKey.self]
                         }
                         set {
-                            self[_ValueKey.self] = newValue
+                            self[_SomeValueKey.self] = newValue
                         }
                     }
-                
+
                     fileprivate static func update(
-                        value atomically: @Sendable @escaping (inout Int ) -> Void) {
-                        update(_ValueKey.self, atomically: atomically)
+                        someValue atomically: @Sendable @escaping (inout Int ) -> Void) {
+                        update(_SomeValueKey.self, atomically: atomically)
                     }
-                
+
                     fileprivate static func update(
-                    value atomically: @Sendable @escaping (inout Int ) throws -> Void) async throws {
-                        try await update(_ValueKey.self, atomically: atomically)
+                    someValue atomically: @Sendable @escaping (inout Int ) throws -> Void) async throws {
+                        try await update(_SomeValueKey.self, atomically: atomically)
                     }
-                
-                    private enum _ValueKey: DependencyKey {
+
+                    private enum _SomeValueKey: DependencyKey {
                         nonisolated(unsafe) static var instance : Int  = 10
                     }
                 }

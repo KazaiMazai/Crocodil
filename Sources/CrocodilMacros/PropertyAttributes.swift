@@ -19,5 +19,5 @@ struct PropertyAttributes {
         propertyType.map { ":\($0) \(initializerClauseSyntax)" } ?? "\(initializerClauseSyntax)"
     }
 
-    var keyName: String { "\(propertyName.capitalized)Key" }
+    var keyName: String { "\(propertyName.prefix(1).uppercased())\(propertyName.dropFirst())Key" }
 }
