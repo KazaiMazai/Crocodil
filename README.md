@@ -132,6 +132,24 @@ try await Dependencies.update(intValue: {
 })
 ```
 
+The async update can return a projection of the value from the mutation closure. The result is read under the same barrier as the write, so it is atomically consistent — no separate read that could race with another writer:
+
+```swift
+// Return the new value (atomic increment-and-get)
+let newValue = try await Dependencies.update(intValue: {
+    $0 += 1
+    return $0
+})
+
+// Return the previous value (atomic fetch-and-add)
+let oldValue = try await Dependencies.update(intValue: {
+    defer { $0 += 1 }
+    return $0
+})
+```
+
+The result is `@discardableResult`, so closures returning `Void` keep working as fire-and-forget updates.
+
 > [!NOTE]
 > Due to Swift macro limitations, atomic mutation is available only for dependencies injected with explicitly declared type. 
 
